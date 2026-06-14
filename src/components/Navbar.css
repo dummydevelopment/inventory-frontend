@@ -1,0 +1,105 @@
+.navbar {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex;
+
+    align-items: center;
+}
+
+.logo {
+    text-decoration: none;
+
+    color: inherit;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    transition: opacity 0.2s;
+}
+
+.logo:hover {
+    opacity: 0.7;
+}
+
+.login-btn {
+    height: 32px;
+
+    padding: 0 16px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 6px;
+
+    background: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition:
+        background 0.2s,
+        border-color 0.2s;
+}
+
+.login-btn:hover {
+    background: #f5f5f5;
+
+    border-color: #9ca3af;
+}
+.logged-user {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.logged-user span {
+    padding: 6px 10px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+}
+
+.email {
+    max-width: 220px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.logout-btn {
+    margin-left: 10px;
+
+    padding: 6px 14px;
+
+    border: 1px solid #ef4444;
+
+    background: white;
+
+    color: #ef4444;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: #fef2f2;
+}

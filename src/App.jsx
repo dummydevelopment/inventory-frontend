@@ -3,6 +3,8 @@ import "./App.css";
 import "./AppLayout.css";
 import { useState } from "react";
 import Workflow from "./components/Workflow";
+import Navbar from "./components/Navbar";
+import Login from "./pages/Login";
 
 function App() {
   const [expanded, setExpanded] = useState({});
@@ -12,7 +14,7 @@ function App() {
       label: "Home",
       route: "/",
     },
-   
+
     {
       label: "Dashboard",
       children: [
@@ -26,7 +28,7 @@ function App() {
         },
       ],
     },
-     {
+    {
       label: "Work flow",
       route: "/workflow",
     },
@@ -82,7 +84,9 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <nav className="navbar">nav</nav>
+        <nav className="navbar-layout">
+          <Navbar />
+        </nav>
 
         <div className="container-aside-main">
 
@@ -112,7 +116,10 @@ function App() {
                 path="/workflow"
                 element={<Workflow />}
               />
-
+              <Route
+                path="/login"
+                element={<Login />}
+              />
               <Route
                 path="/dashboard/main"
                 element={<h1>Main Dashboard</h1>}
