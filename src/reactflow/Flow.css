@@ -11,6 +11,9 @@
 }
 
 .node {
+        cursor: grab;
+
+    user-select: none;
     position: absolute;
 
     min-width: 220px;
@@ -29,7 +32,9 @@
     z-index: 1;
     border: 1px solid rebeccapurple;
 }
-
+.node:active {
+    cursor: grabbing;
+}
 .actions,
 .action {
     position: relative;

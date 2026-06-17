@@ -4,7 +4,7 @@ import Node from "./components/Node";
 import Edge from "./components/Edge";
 import { useEffect } from "react";
 
-const nodes = [
+const INITIAL_NODES = [
   {
     id: "0.1",
     x: 100,
@@ -66,6 +66,8 @@ const nodes = [
 ];
 
 export default function Flow() {
+  const [nodes, setNodes] = useState(INITIAL_NODES);
+  const dragRef = useRef(null);
   const nodeRefs = useRef({});
   const actionRefs = useRef({});
   const containerRef = useRef(null);
@@ -81,6 +83,45 @@ export default function Flow() {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+  };
+  const startDrag = (id, e) => {
+    e.preventDefault();
+
+    const node = nodes.find((n) => n.id === id);
+
+    dragRef.current = {
+      id,
+
+      offsetX: e.clientX - node.x,
+
+      offsetY: e.clientY - node.y,
+    };
+  };
+
+  const moveDrag = (e) => {
+    handleMouseMove(e);
+
+    if (!dragRef.current) return;
+
+    const { id, offsetX, offsetY } = dragRef.current;
+
+    setNodes((prev) =>
+      prev.map((node) =>
+        node.id === id
+          ? {
+              ...node,
+
+              x: e.clientX - offsetX,
+
+              y: e.clientY - offsetY,
+            }
+          : node,
+      ),
+    );
+  };
+
+  const stopDrag = () => {
+    dragRef.current = null;
   };
   useLayoutEffect(() => {
     const update = () => {
@@ -129,7 +170,7 @@ export default function Flow() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [nodes]);
   function getClosestPoints(start, end) {
     const sourcePoints = [
       { x: start.left, y: start.centerY }, // left
@@ -194,7 +235,9 @@ export default function Flow() {
     <div
       ref={containerRef}
       className="flow-container"
-      onMouseMove={handleMouseMove}
+      onMouseMove={moveDrag}
+      onMouseUp={stopDrag}
+      onMouseLeave={stopDrag}
     >
       {/* horizontal ruler */}
       <div className="ruler-x">
@@ -249,6 +292,7 @@ export default function Flow() {
         <Node
           key={node.id}
           {...node}
+          onDragStart={startDrag}
           ref={(el) => {
             nodeRefs.current[node.id] = el;
           }}
