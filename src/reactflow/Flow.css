@@ -1,39 +1,64 @@
 .flow-container {
-  position: relative;
+    position: relative;
 
-  width: 100vw;
-  height: 100vh;
+    width: 100vw;
+    height: 100vh;
 
-  background: #f7f7f7;
+    background: #585555;
 
-  overflow: hidden;
+    overflow: hidden;
+    /* isolation: isolate;  */
 }
 
 .node {
-  position: absolute;
+    position: absolute;
 
-  width: 160px;
-  height: 60px;
+    min-width: 220px;
 
-  background: white;
+    background: white;
 
-  border: 2px solid #ddd;
-  border-radius: 12px;
+    padding: 20px;
 
-  display: flex;
+    border-radius: 12px;
 
-  align-items: center;
-  justify-content: center;
+    display: flex;
 
-  box-shadow:
-    0 4px 12px rgba(0,0,0,.1);
+    flex-direction: column;
+
+    gap: 12px;
+    z-index: 1;
+    border: 1px solid rebeccapurple;
+}
+
+.actions,
+.action {
+    position: relative;
+}
+
+.actions {
+    display: flex;
+
+    /* flex-direction: column; */
+
+    gap: 8px;
+    /* z-index: 5; */
+}
+
+.action {
+    padding: 8px;
+
+    background: #eee;
+
+    border-radius: 8px;
+    /* z-index: 5; */
 }
 
 .edge-layer {
-  position: absolute;
+    position: absolute;
 
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 
-  pointer-events: none;
+    pointer-events: none;
+    z-index: 2;
 }
