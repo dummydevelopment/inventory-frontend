@@ -1,10 +1,22 @@
-export default function Edge({ startX, startY, endX, endY }) {
+import { useState } from "react";
+
+export default function Edge({
+  sourceId,
+  targetId,
+  onAddNode,
+  startX,
+  startY,
+  endX,
+  endY,
+}) {
+  const [showInfo, setShowInfo] = useState(false);
+  const centerX = (startX + endX) / 2;
+  const centerY = (startY + endY) / 2;
   return (
     <svg className="edge-layer">
-      {/* Arrow definition */}
       <defs>
         <marker
-          id="arrow"
+          id={`arrow-${sourceId}-${targetId}`}
           markerWidth="10"
           markerHeight="10"
           refX="8"
@@ -15,19 +27,68 @@ export default function Edge({ startX, startY, endX, endY }) {
         </marker>
       </defs>
 
-      {/* line */}
-      <line
-        x1={startX}
-        y1={startY}
-        x2={endX}
-        y2={endY}
-        stroke="#444"
-        strokeWidth="3"
-        markerEnd="url(#arrow)"
-      />
+      <g
+        style={{
+          pointerEvents: "all",
+        }}
+        onMouseEnter={() => setShowInfo(true)}
+        onMouseLeave={() => setShowInfo(false)}
+      >
+        {/* invisible hit area */}
+        <line
+          x1={startX}
+          y1={startY}
+          x2={endX}
+          y2={endY}
+          stroke="transparent"
+          strokeWidth="20"
+        />
 
-      {/* start point */}
-      <circle cx={startX} cy={startY} r="6" fill="#444" />
+        {/* visible edge */}
+        <line
+          x1={startX}
+          y1={startY}
+          x2={endX}
+          y2={endY}
+          stroke="#444"
+          strokeWidth="3"
+          markerEnd={`url(#arrow-${sourceId}-${targetId})`}
+          pointerEvents="none"
+        />
+
+        <circle
+          cx={startX}
+          cy={startY}
+          r="8"
+          fill="#444"
+          pointerEvents="none"
+        />
+
+        {showInfo && (
+          <foreignObject
+            x={(startX + endX) / 2 - 40}
+            y={(startY + endY) / 2 - 18}
+            width="80"
+            height="36"
+          >
+            <button
+              className="edge-add-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("add node");
+                onAddNode({
+                  sourceId,
+                  targetId,
+                  x: centerX,
+                  y: centerY,
+                });
+              }}
+            >
+              + Add
+            </button>
+          </foreignObject>
+        )}
+      </g>
     </svg>
   );
 }
