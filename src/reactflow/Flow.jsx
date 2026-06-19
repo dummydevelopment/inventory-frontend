@@ -76,6 +76,7 @@ export default function Flow() {
     x: 0,
     y: 0,
   });
+  const [connecting, setConnecting] = useState(null);
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
@@ -100,6 +101,7 @@ export default function Flow() {
 
   const moveDrag = (e) => {
     handleMouseMove(e);
+    moveConnect(e);
 
     if (!dragRef.current) return;
 
@@ -122,6 +124,7 @@ export default function Flow() {
 
   const stopDrag = () => {
     dragRef.current = null;
+    // setConnecting(null);
   };
   useLayoutEffect(() => {
     const update = () => {
@@ -231,54 +234,110 @@ export default function Flow() {
       });
     });
   });
-//   useEffect(() => {
-//     // console.log("edges", edges, "points", points);
-//   }, [edges, points]);
-function insertNodeBetween({
-  sourceId,
-  targetId,
-  x,
-  y,
-}) {
-  const newId = String(Date.now());
+  //   useEffect(() => {
+  //     // console.log("edges", edges, "points", points);
+  //   }, [edges, points]);
+  function insertNodeBetween({ sourceId, targetId, x, y }) {
+    const newId = String(Date.now());
 
-  setNodes((prev) => {
-    const updated = prev.map((node) => {
-      if (node.id === sourceId) {
+    setNodes((prev) => {
+      const updated = prev.map((node) => {
+        if (node.id === sourceId) {
+          return {
+            ...node,
+            nextId: newId,
+          };
+        }
+
+        if (node.actions) {
+          return {
+            ...node,
+            actions: node.actions.map((a) =>
+              a.id === sourceId
+                ? {
+                    ...a,
+                    nextId: newId,
+                  }
+                : a,
+            ),
+          };
+        }
+
+        return node;
+      });
+
+      updated.push({
+        id: newId,
+        label: "New Node",
+        x,
+        y,
+        nextId: targetId,
+      });
+
+      return updated;
+    });
+  }
+  function startConnect(sourceId, e) {
+    e.stopPropagation();
+
+    const rect = containerRef.current.getBoundingClientRect();
+
+    setConnecting({
+      sourceId,
+
+      startX: e.clientX - rect.left,
+      startY: e.clientY - rect.top,
+
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }
+
+  function moveConnect(e) {
+    if (!connecting) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+
+    setConnecting((prev) => ({
+      ...prev,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    }));
+  }
+
+  function finishConnect(targetId) {
+    if (!connecting) return;
+
+    if (targetId === connecting.sourceId) {
+      setConnecting(null);
+      return;
+    }
+
+    setNodes((prev) =>
+      prev.map((node) => {
+        if (node.id === connecting.sourceId) {
+          return {
+            ...node,
+            nextId: targetId,
+          };
+        }
+
         return {
           ...node,
-          nextId: newId,
-        };
-      }
-
-      if (node.actions) {
-        return {
-          ...node,
-          actions: node.actions.map((a) =>
-            a.id === sourceId
+          actions: node.actions?.map((a) =>
+            a.id === connecting.sourceId
               ? {
                   ...a,
-                  nextId: newId,
+                  nextId: targetId,
                 }
-              : a
+              : a,
           ),
         };
-      }
+      }),
+    );
 
-      return node;
-    });
-
-    updated.push({
-      id: newId,
-      label: "New Node",
-      x,
-      y,
-      nextId: targetId,
-    });
-
-    return updated;
-  });
-}
+    setConnecting(null);
+  }
   return (
     <div
       ref={containerRef}
@@ -327,8 +386,7 @@ function insertNodeBetween({
             key={edge.source + edge.target}
             sourceId={edge?.sourceId}
             targetId={edge?.targetId}
-              onAddNode={insertNodeBetween}
-
+            onAddNode={insertNodeBetween}
             {...closest}
 
             // startX={start.x}
@@ -343,6 +401,8 @@ function insertNodeBetween({
       {nodes.map((node) => (
         <Node
           key={node.id}
+          onConnectStart={startConnect}
+          onConnectEnd={finishConnect}
           {...node}
           onDragStart={startDrag}
           ref={(el) => {
@@ -353,6 +413,19 @@ function insertNodeBetween({
           }}
         />
       ))}
+      {connecting && (
+        <svg className="edge-layer">
+          <line
+            x1={connecting.startX}
+            y1={connecting.startY}
+            x2={connecting.x}
+            y2={connecting.y}
+            stroke="#1976d2"
+            strokeWidth="3"
+            strokeDasharray="10"
+          />
+        </svg>
+      )}
     </div>
   );
 }
